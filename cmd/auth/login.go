@@ -56,10 +56,13 @@ func NewAuthLoginCommand() *cobra.Command {
 			}
 
 			s := internal.NewSpinner()
+
 			s.Suffix = " process login request..."
 			s.FinalMSG = "  process login request...timeout."
+			url := fmt.Sprintf("%s/auth/%s/authorize?session=%s&expires=%d", host, provider, session, timeout)
+			fmt.Printf("如果系统浏览器没有自动打开，请访问：%s\n", url)
 			s.Start()
-			browser.OpenURL(fmt.Sprintf("%s/auth/%s/authorize?session=%s&expires=%d", host, provider, session, timeout))
+			browser.OpenURL(url)
 			intervals := []int{2, 1, 2, 3, 3, 3, 5, 5, 6}
 			for _, interval := range intervals {
 				if resp, err := internal.R().
