@@ -61,7 +61,7 @@ func NewUpdateCommand(version string) *cobra.Command {
 						spinner.FinalMSG = " 完成"
 						spinner.Start()
 						if err := updater.BackgroundRun(); err != nil {
-							spinner.FinalMSG = "更新出错，请稍后再试"
+							spinner.FinalMSG = "更新出错，使用 sudo 尝试更新"
 						}
 						spinner.Stop()
 					}
