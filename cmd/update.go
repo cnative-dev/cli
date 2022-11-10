@@ -44,25 +44,27 @@ func NewUpdateCommand(version string) *cobra.Command {
 				if !strings.HasSuffix(updateBase, "/") {
 					updateBase = fmt.Sprintf("%s/", updateBase)
 				}
-				var updater = &selfupdate.Updater{
-					CurrentVersion: version,
-					ApiURL:         updateBase,
-					BinURL:         updateBase,
-					DiffURL:        updateBase,
-					Dir:            ".update/",
-					CheckTime:      24,
-					CmdName:        "cnative",
-					ForceCheck:     true,
-				}
-				if newV, e := updater.UpdateAvailable(); e == nil && newV != "" {
-					spinner := internal.NewSpinner()
-					spinner.Suffix = " 正在更新..."
-					spinner.FinalMSG = " 完成"
-					spinner.Start()
-					if err := updater.BackgroundRun(); err != nil {
-						spinner.FinalMSG = "更新出错，请稍后再试"
+				if home, err := os.UserHomeDir(); err == nil {
+					var updater = &selfupdate.Updater{
+						CurrentVersion: version,
+						ApiURL:         updateBase,
+						BinURL:         updateBase,
+						DiffURL:        updateBase,
+						Dir:            fmt.Sprintf("%s/.cnative/", home),
+						CheckTime:      24,
+						CmdName:        "cnative",
+						ForceCheck:     true,
 					}
-					spinner.Stop()
+					if newV, e := updater.UpdateAvailable(); e == nil && newV != "" {
+						spinner := internal.NewSpinner()
+						spinner.Suffix = " 正在更新..."
+						spinner.FinalMSG = " 完成"
+						spinner.Start()
+						if err := updater.BackgroundRun(); err != nil {
+							spinner.FinalMSG = "更新出错，请稍后再试"
+						}
+						spinner.Stop()
+					}
 				}
 			} else {
 				fmt.Fprintln(os.Stderr, err.Error())
