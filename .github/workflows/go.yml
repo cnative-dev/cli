@@ -78,6 +78,9 @@ jobs:
 
     - run: ossutil cp -r oss://cnative-client-release ./oss
 
+    - name: Delete old latest folder
+      run: rm -rf oss/cnative/latest
+
     - uses: actions/download-artifact@master
       with:
         name: artifact
