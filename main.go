@@ -22,7 +22,11 @@ THE SOFTWARE.
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"github.com/cnative-dev/cli/cmd"
+	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
 
@@ -32,6 +36,14 @@ func main() {
 		// 真正 cmd.Execute 了之后的分支，通过 cobra.OnInitialize 完成了 viper 的配置
 		viper.WriteConfig()
 	} else {
+		home, err := os.UserHomeDir()
+		cobra.CheckErr(err)
+
+		// Search config in home directory with name ".cnative" (without extension).
+		viper.AddConfigPath(fmt.Sprintf("%s/.cnative/", home))
+		viper.SetConfigType("yaml")
+		viper.SetConfigName("config")
+
 		// 所有没有 Execute 的分支，因为不会调用 cobra.OnInitialize
 		viper.SafeWriteConfig()
 	}
