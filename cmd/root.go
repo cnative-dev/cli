@@ -136,7 +136,7 @@ func init() {
 	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cnative.yaml)")
 	rootCmd.PersistentFlags().MarkHidden("config")
 	rootCmd.SetHelpCommand(&cobra.Command{Hidden: true})
-	rootCmd.SetVersionTemplate(`{{printf "Version: %s" .Version}}`)
+	rootCmd.SetVersionTemplate(`{{printf "Version: %s\n" .Version}}`)
 
 }
 
