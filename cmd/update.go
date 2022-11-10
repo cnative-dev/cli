@@ -58,10 +58,10 @@ func NewUpdateCommand(version string) *cobra.Command {
 					if newV, e := updater.UpdateAvailable(); e == nil && newV != "" {
 						spinner := internal.NewSpinner()
 						spinner.Suffix = " 正在更新..."
-						spinner.FinalMSG = " 完成"
+						spinner.FinalMSG = " 完成\n"
 						spinner.Start()
 						if err := updater.BackgroundRun(); err != nil {
-							spinner.FinalMSG = "更新出错，使用 sudo 尝试更新"
+							spinner.FinalMSG = "更新出错，使用 sudo 尝试更新\n"
 						}
 						spinner.Stop()
 					}
