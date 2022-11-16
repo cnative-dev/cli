@@ -71,20 +71,20 @@ func NewAuthLoginCommand() *cobra.Command {
 					Get("/api/auth"); err == nil && resp.StatusCode() == 200 {
 					s.FinalMSG = "  process login request...done.\n"
 					viper.Set("token", responseToken.Token)
-					// 设置 netrc
-					rcs, _ := internal.ReadNetrc()
-					filtered := []internal.NetrcLine{}
-					for _, rc := range rcs {
-						if rc.Machine != "git.cnative.dev" {
-							filtered = append(filtered, rc)
-						}
-					}
-					filtered = append(filtered, internal.NetrcLine{
-						Machine:  "git.cnative.dev",
-						Login:    "cnative",
-						Password: responseToken.GitToken,
-					})
-					internal.WriteNetrc(filtered)
+					// // 设置 netrc
+					// rcs, _ := internal.ReadNetrc()
+					// filtered := []internal.NetrcLine{}
+					// for _, rc := range rcs {
+					// 	if rc.Machine != "git.cnative.dev" {
+					// 		filtered = append(filtered, rc)
+					// 	}
+					// }
+					// filtered = append(filtered, internal.NetrcLine{
+					// 	Machine:  "git.cnative.dev",
+					// 	Login:    "cnative",
+					// 	Password: responseToken.GitToken,
+					// })
+					// internal.WriteNetrc(filtered)
 					break
 				}
 				time.Sleep(time.Duration(interval) * time.Second)
