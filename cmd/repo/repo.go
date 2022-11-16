@@ -39,6 +39,6 @@ func NewRepoCommand() *cobra.Command {
 		Short:   "管理仓库",
 	}
 	internal.InitCommand(cmd)
-	cmd.AddCommand(NewRepoRemoteCommand())
+	cmd.AddCommand(NewRepoPushCommand())
 	return cmd
 }
