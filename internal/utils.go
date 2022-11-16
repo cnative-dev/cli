@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
@@ -132,4 +133,15 @@ func Endpoints() (map[string]string, error) {
 	endpoints := make(map[string]string)
 	_, err := R().SetResult(&endpoints).Get("/api/endpoints")
 	return endpoints, err
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
+
+func RandSeq(length int) string {
+	rand.Seed(time.Now().Unix())
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
