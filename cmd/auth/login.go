@@ -58,7 +58,7 @@ func NewAuthLoginCommand() *cobra.Command {
 			s := internal.NewSpinner()
 
 			s.Suffix = " process login request..."
-			s.FinalMSG = "  process login request...timeout."
+			s.FinalMSG = "  process login request...timeout.\n"
 			url := fmt.Sprintf("%s/auth/%s/authorize?session=%s&expires=%d", host, provider, session, timeout)
 			fmt.Printf("如果系统浏览器没有自动打开，请访问：%s\n", url)
 			s.Start()
@@ -69,22 +69,22 @@ func NewAuthLoginCommand() *cobra.Command {
 					SetQueryParam("session", session).
 					SetResult(responseToken).
 					Get("/api/auth"); err == nil && resp.StatusCode() == 200 {
-					s.FinalMSG = "  process login request...done."
+					s.FinalMSG = "  process login request...done.\n"
 					viper.Set("token", responseToken.Token)
-					// 设置 netrc
-					rcs, _ := internal.ReadNetrc()
-					filtered := []internal.NetrcLine{}
-					for _, rc := range rcs {
-						if rc.Machine != "git.cnative.dev" {
-							filtered = append(filtered, rc)
-						}
-					}
-					filtered = append(filtered, internal.NetrcLine{
-						Machine:  "git.cnative.dev",
-						Login:    "cnative",
-						Password: responseToken.GitToken,
-					})
-					internal.WriteNetrc(filtered)
+					// // 设置 netrc
+					// rcs, _ := internal.ReadNetrc()
+					// filtered := []internal.NetrcLine{}
+					// for _, rc := range rcs {
+					// 	if rc.Machine != "git.cnative.dev" {
+					// 		filtered = append(filtered, rc)
+					// 	}
+					// }
+					// filtered = append(filtered, internal.NetrcLine{
+					// 	Machine:  "git.cnative.dev",
+					// 	Login:    "cnative",
+					// 	Password: responseToken.GitToken,
+					// })
+					// internal.WriteNetrc(filtered)
 					break
 				}
 				time.Sleep(time.Duration(interval) * time.Second)
