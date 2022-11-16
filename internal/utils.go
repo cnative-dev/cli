@@ -32,7 +32,20 @@ func NewSpinner() *spinner.Spinner {
 	go func() {
 		<-sigc
 		spin.Stop()
-		os.Exit(0)
+		os.Exit(1)
+	}()
+	return spin
+}
+
+func NewSpinnerWithHook(callback func()) *spinner.Spinner {
+	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		<-sigc
+		spin.Stop()
+		callback()
+		os.Exit(1)
 	}()
 	return spin
 }
