@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"io"
+	"math/rand"
 	"os"
 	"os/signal"
 	"strings"
@@ -31,7 +32,20 @@ func NewSpinner() *spinner.Spinner {
 	go func() {
 		<-sigc
 		spin.Stop()
-		os.Exit(0)
+		os.Exit(1)
+	}()
+	return spin
+}
+
+func NewSpinnerWithHook(callback func()) *spinner.Spinner {
+	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	sigc := make(chan os.Signal, 1)
+	signal.Notify(sigc, syscall.SIGTERM, syscall.SIGINT)
+	go func() {
+		<-sigc
+		spin.Stop()
+		callback()
+		os.Exit(1)
 	}()
 	return spin
 }
@@ -132,4 +146,15 @@ func Endpoints() (map[string]string, error) {
 	endpoints := make(map[string]string)
 	_, err := R().SetResult(&endpoints).Get("/api/endpoints")
 	return endpoints, err
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
+
+func RandSeq(length int) string {
+	rand.Seed(time.Now().Unix())
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
