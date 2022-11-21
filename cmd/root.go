@@ -26,6 +26,7 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cnative-dev/cli/cmd/auth"
@@ -36,6 +37,7 @@ import (
 	"github.com/cnative-dev/cli/cmd/secret"
 	"github.com/cnative-dev/cli/internal"
 	"github.com/fatih/color"
+	"github.com/kardianos/osext"
 	"github.com/sanbornm/go-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -44,6 +46,12 @@ import (
 
 var cfgFile string
 var version = "dev"
+
+func getExecRelativeDir(dir string) string {
+	filename, _ := osext.Executable()
+	path := filepath.Join(filepath.Dir(filename), dir)
+	return path
+}
 
 // rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
@@ -58,59 +66,59 @@ var rootCmd = &cobra.Command{
 	},
 	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
-		if home, err := os.UserHomeDir(); err == nil {
-			updateDir := fmt.Sprintf("%s/.cnative/", home)
-			var preupdater = &selfupdate.Updater{
-				CurrentVersion: version,
-				Dir:            updateDir,
-				CmdName:        "cnative",
-				ForceCheck:     false,
-			}
-			if preupdater.WantUpdate() {
-				if endpoints, err := internal.Endpoints(); err == nil {
-					updateBase := endpoints["update"]
-					if !strings.HasSuffix(updateBase, "/") {
-						updateBase = fmt.Sprintf("%s/", updateBase)
+		updateDir := ".cnative" + string(os.PathSeparator)
+		os.MkdirAll(getExecRelativeDir(updateDir), 0777)
+		var preupdater = &selfupdate.Updater{
+			CurrentVersion: version,
+			Dir:            updateDir,
+			CmdName:        "cnative",
+			ForceCheck:     false,
+		}
+		if preupdater.WantUpdate() {
+			if endpoints, err := internal.Endpoints(); err == nil {
+				updateBase := endpoints["update"]
+				if !strings.HasSuffix(updateBase, "/") {
+					updateBase = fmt.Sprintf("%s/", updateBase)
+				}
+				var updater = &selfupdate.Updater{
+					CurrentVersion: version,
+					ApiURL:         updateBase,
+					BinURL:         updateBase,
+					DiffURL:        updateBase,
+					Dir:            updateDir,
+					CheckTime:      24,
+					CmdName:        "cnative",
+					ForceCheck:     false,
+				}
+				if newVersion, err := updater.UpdateAvailable(); err == nil && newVersion != "" {
+					// 有新版本
+					if !semver.IsValid(newVersion) {
+						return
 					}
-					var updater = &selfupdate.Updater{
-						CurrentVersion: version,
-						ApiURL:         updateBase,
-						BinURL:         updateBase,
-						DiffURL:        updateBase,
-						Dir:            updateDir,
-						CheckTime:      24,
-						CmdName:        "cnative",
-						ForceCheck:     false,
+					// 不看 patch，只看功能更新
+					var oldV string
+					newV := semver.MajorMinor(newVersion)
+					if semver.IsValid(updater.CurrentVersion) {
+						oldV = semver.MajorMinor(updater.CurrentVersion)
+					} else {
+						oldV = semver.MajorMinor("v0.0.0")
 					}
-					if newVersion, err := updater.UpdateAvailable(); err == nil && newVersion != "" {
-						if !semver.IsValid(newVersion) {
-							return
-						}
-						// 不看 patch，只看功能更新
-						var oldV string
-						newV := semver.MajorMinor(newVersion)
-						if semver.IsValid(updater.CurrentVersion) {
-							oldV = semver.MajorMinor(updater.CurrentVersion)
-						} else {
-							oldV = semver.MajorMinor("v0.0.0")
-						}
-						if semver.Compare(newV, oldV) > 0 {
-							color.HiGreen("cnative 有版本更新：%s -> %s\n请执行 sudo cnative update 来更新客户端\n", updater.CurrentVersion, newVersion)
-							if semver.Compare(semver.Major(newV), semver.Major(oldV)) <= 0 {
-								// 如果没有大版本更新（只有功能更新）那就跳过一段时间再检查，否则每次都提示
-								os.MkdirAll(updater.Dir, 0777)
-								updater.SetUpdateTime()
-							}
-						} else {
+					if semver.Compare(newV, oldV) > 0 { //应该恒为 true
+						color.HiGreen("cnative 有版本更新：%s -> %s\n请执行 sudo cnative update 来更新客户端\n", updater.CurrentVersion, newVersion)
+						if semver.Compare(semver.Major(newV), semver.Major(oldV)) <= 0 {
+							// 如果没有大版本更新（只有功能更新）那就跳过一段时间再检查，否则每次都提示
 							updater.SetUpdateTime()
 						}
 					}
-				} else {
-					fmt.Fprintln(os.Stderr, err.Error())
-					os.Exit(1)
+				} else if err == nil && newVersion == "" { //没有新版本
+					updater.SetUpdateTime()
 				}
+			} else {
+				fmt.Fprintln(os.Stderr, err.Error())
+				os.Exit(1)
 			}
 		}
+
 	},
 }
 
