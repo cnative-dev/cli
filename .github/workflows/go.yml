@@ -105,6 +105,10 @@ jobs:
         for f in *; do mv -- "$f" "cnative-$f"; done && \
         cd ../../../
 
+    - name: Remove old file
+      run: |
+        find oss/cnative -name "*.gz" -not -path "oss/cnative/${{ github.ref_name }}" -exec rm -f {} \;
+
     - name: Add extension for windows
       run: for f in oss/cnative/latest/*-windows-*; do mv -- "$f" "$f.exe"; done
 
@@ -113,6 +117,9 @@ jobs:
 
     - name: Show files
       run: find .
+
+    - name: Remove old artifact in oss
+      run: ossutil rm -r oss://cnative-client-release/cnative
 
     - name: Upload artifact
       run: ossutil cp -r -u ./oss oss://cnative-client-release 
