@@ -42,11 +42,12 @@ func NewBuildListCommand() *cobra.Command {
 				builds := &[]ListBuild{}
 				if resp, err := internal.R().
 					SetPathParam("projectId", project).
-					Get("/api/projects/{projectId}/builds"); err == nil && resp.StatusCode() == 200 {
+					Get("/api/projects/{projectId}/builds"); err == nil &&
+					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					json.Unmarshal(resp.Body(), builds)
 					internal.PrettyStructArray(builds, reflect.TypeOf(ListBuild{}))
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})

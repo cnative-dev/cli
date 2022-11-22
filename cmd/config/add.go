@@ -42,10 +42,11 @@ func NewConfigAddCommand() *cobra.Command {
 					SetPathParam("project", project).
 					SetPathParam("key", args[0]).
 					SetQueryParam("value", args[1]).
-					Post("/api/projects/{project}/configs/{key}"); err == nil && resp.StatusCode() == 200 {
+					Post("/api/projects/{project}/configs/{key}"); err == nil &&
+					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					fmt.Println("完成")
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})

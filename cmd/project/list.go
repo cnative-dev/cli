@@ -41,11 +41,12 @@ func NewProjectListCommand() *cobra.Command {
 			internal.WithAuthorized(func() {
 				projects := &[]Project{}
 				if resp, err := internal.R().
-					Get("/api/projects"); err == nil && resp.StatusCode() == 200 {
+					Get("/api/projects"); err == nil &&
+					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					json.Unmarshal(resp.Body(), projects)
 					internal.PrettyStructArray(projects, reflect.TypeOf(Project{}))
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})

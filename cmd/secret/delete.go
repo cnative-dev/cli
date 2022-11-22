@@ -44,7 +44,7 @@ func NewSecretDeleteCommand() *cobra.Command {
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					fmt.Printf("Secret 已删除\n")
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})
