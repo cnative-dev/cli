@@ -42,11 +42,12 @@ func NewConfigListCommand() *cobra.Command {
 				config := &Config{}
 				if resp, err := internal.R().
 					SetPathParam("project", project).
-					Get("/api/projects/{project}/configs"); err == nil && resp.StatusCode() == 200 {
+					Get("/api/projects/{project}/configs"); err == nil &&
+					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					json.Unmarshal(resp.Body(), config)
 					internal.PrettyMapAsArray(*config)
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})

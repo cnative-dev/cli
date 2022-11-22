@@ -41,10 +41,11 @@ func NewProjectDescribeCommand() *cobra.Command {
 				if resp, err := internal.R().
 					SetResult(project).
 					SetPathParam("projectId", args[0]).
-					Get("/api/projects/{projectId}"); err == nil && resp.StatusCode() == 200 {
+					Get("/api/projects/{projectId}"); err == nil &&
+					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					internal.PrettyStruct(project)
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					os.Exit(1)
 				}
 			})

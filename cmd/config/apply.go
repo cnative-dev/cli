@@ -69,11 +69,12 @@ func NewConfigApplyCommand() *cobra.Command {
 						SetResult(config).
 						SetBody(properties).
 						SetPathParam("project", project).
-						Post("/api/projects/{project}/configs"); err == nil && resp.StatusCode() == 200 {
+						Post("/api/projects/{project}/configs"); err == nil &&
+						resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 						internal.PrettyMapAsArray(*config)
 						fmt.Println("完成")
 					} else {
-						fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Error)
+						fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 						os.Exit(1)
 					}
 				}
