@@ -1,6 +1,7 @@
 package internal
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/go-resty/resty/v2"
@@ -9,6 +10,7 @@ import (
 )
 
 var client = resty.New()
+var clientVersion = "dev"
 
 func init() {
 	if base, found := os.LookupEnv("CNATIVE_API"); found {
@@ -23,10 +25,14 @@ type ErrResp struct {
 	Details interface{} `json:"details,omitempty"`
 }
 
+func SetVersion(version string) {
+	clientVersion = version
+}
+
 func R() *resty.Request {
 	request := client.R()
 	request.SetHeader("Content-Type", "application/json")
-	request.SetHeader("User-Agent", "cnative/0.1.0")
+	request.SetHeader("User-Agent", fmt.Sprintf("cnative/%s", clientVersion))
 	request.SetError(ErrResp{})
 	if viper.IsSet("token") {
 		tokenString := viper.GetString("token")

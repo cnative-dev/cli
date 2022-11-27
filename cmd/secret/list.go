@@ -48,7 +48,7 @@ func NewSecretListCommand() *cobra.Command {
 					internal.PrettyArray(*secret)
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

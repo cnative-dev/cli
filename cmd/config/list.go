@@ -48,7 +48,7 @@ func NewConfigListCommand() *cobra.Command {
 					internal.PrettyMapAsArray(*config)
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

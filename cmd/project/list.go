@@ -47,7 +47,7 @@ func NewProjectListCommand() *cobra.Command {
 					internal.PrettyStructArray(projects, reflect.TypeOf(Project{}))
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

@@ -66,6 +66,7 @@ var rootCmd = &cobra.Command{
 	},
 	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		internal.SetVersion(version)
 		updateDir := ".cnative" + string(os.PathSeparator)
 		os.MkdirAll(getExecRelativeDir(updateDir), 0777)
 		var preupdater = &selfupdate.Updater{
@@ -115,7 +116,7 @@ var rootCmd = &cobra.Command{
 				}
 			} else {
 				fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(1)
+				return
 			}
 		}
 
@@ -127,7 +128,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		os.Exit(1)
+		return
 	}
 }
 
