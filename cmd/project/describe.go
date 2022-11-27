@@ -46,7 +46,7 @@ func NewProjectDescribeCommand() *cobra.Command {
 					internal.PrettyStruct(project)
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

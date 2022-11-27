@@ -46,7 +46,7 @@ func NewSecretRemoveCommand() *cobra.Command {
 					fmt.Printf("Secret %s 已删除\n", args[0])
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

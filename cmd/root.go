@@ -115,7 +115,7 @@ var rootCmd = &cobra.Command{
 				}
 			} else {
 				fmt.Fprintln(os.Stderr, err.Error())
-				os.Exit(1)
+				return
 			}
 		}
 
@@ -127,7 +127,7 @@ var rootCmd = &cobra.Command{
 func Execute() {
 	err := rootCmd.Execute()
 	if err != nil {
-		os.Exit(1)
+		return
 	}
 }
 

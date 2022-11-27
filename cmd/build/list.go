@@ -48,7 +48,7 @@ func NewBuildListCommand() *cobra.Command {
 					internal.PrettyStructArray(builds, reflect.TypeOf(ListBuild{}))
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

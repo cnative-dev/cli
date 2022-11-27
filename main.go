@@ -31,6 +31,7 @@ import (
 )
 
 func main() {
+	// defer profile.Start().Stop()
 	cmd.Execute()
 	if err := viper.ReadInConfig(); err == nil {
 		// 真正 cmd.Execute 了之后的分支，通过 cobra.OnInitialize 完成了 viper 的配置

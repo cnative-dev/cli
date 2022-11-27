@@ -45,7 +45,7 @@ func NewProjectRenameCommand() *cobra.Command {
 					fmt.Printf("项目 %s 重命名成功\n", project)
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

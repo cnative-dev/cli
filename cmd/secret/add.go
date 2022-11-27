@@ -47,7 +47,7 @@ func NewSecretAddCommand() *cobra.Command {
 					fmt.Println("完成")
 				} else {
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
-					os.Exit(1)
+					return
 				}
 			})
 		},

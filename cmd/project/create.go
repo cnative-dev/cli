@@ -50,7 +50,7 @@ func NewProjectCreateCommand() *cobra.Command {
 					s.Disable()
 					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
 					s.Stop()
-					os.Exit(1)
+					return
 				}
 				s.Enable()
 				s.Stop()

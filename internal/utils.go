@@ -32,7 +32,7 @@ func NewSpinner() *spinner.Spinner {
 	go func() {
 		<-sigc
 		spin.Stop()
-		os.Exit(1)
+		return
 	}()
 	return spin
 }
@@ -45,7 +45,7 @@ func NewSpinnerWithHook(callback func()) *spinner.Spinner {
 		<-sigc
 		spin.Stop()
 		callback()
-		os.Exit(1)
+		return
 	}()
 	return spin
 }
