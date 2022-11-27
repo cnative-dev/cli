@@ -24,6 +24,7 @@ package repo
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"os"
 
@@ -74,14 +75,14 @@ func NewRepoPushCommand() *cobra.Command {
 								Auth:       auth,
 								Force:      force,
 							}
-							fmt.Printf("正在推送本地分支 %s, 到项目 %s", currentReference.Name().Short(), args[0])
+							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
 							spinner := internal.NewSpinnerWithHook(func() {
 								repo.DeleteRemote(remoteName)
 							})
 							spinner.Start()
 							//推送
 							if err := repo.Push(options); err != nil {
-								if err == git.ErrForceNeeded {
+								if err == git.ErrForceNeeded || strings.HasPrefix(err.Error(), "non-fast-forward") {
 									spinner.Disable()
 									fmt.Fprintln(os.Stderr, "远程提交历史记录与本地不同步，请确认本地代码和项目的对应关系，强制推送请用 force 参数")
 									spinner.Enable()
