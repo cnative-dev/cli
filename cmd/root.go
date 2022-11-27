@@ -66,6 +66,7 @@ var rootCmd = &cobra.Command{
 	},
 	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		internal.SetVersion(version)
 		updateDir := ".cnative" + string(os.PathSeparator)
 		os.MkdirAll(getExecRelativeDir(updateDir), 0777)
 		var preupdater = &selfupdate.Updater{
