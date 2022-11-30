@@ -13,6 +13,7 @@ import (
 
 	"github.com/briandowns/spinner"
 	"github.com/golang-jwt/jwt/v4"
+	"github.com/sanbornm/go-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 )
@@ -138,10 +139,29 @@ Use "{{.CommandPath}} [command] --help" for more information about a command.{{e
 `)
 }
 
-func Endpoints() (map[string]string, error) {
+func fetchEndpoints() (map[string]string, error) {
 	endpoints := make(map[string]string)
 	_, err := R().SetResult(&endpoints).Get("/api/endpoints")
 	return endpoints, err
+}
+
+func Endpoints() (map[string]string, error) {
+	cachedEndpoints := viper.GetStringMapString("endpoints")
+	if len(cachedEndpoints) != 0 {
+		go func() { //update background
+			endpoints, err := fetchEndpoints()
+			if err == nil {
+				viper.Set("endpoints", endpoints)
+			}
+		}()
+		return cachedEndpoints, nil
+	} else {
+		endpoints, err := fetchEndpoints()
+		if err == nil {
+			viper.Set("endpoints", endpoints)
+		}
+		return endpoints, err
+	}
 }
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyz1234567890")
@@ -153,4 +173,27 @@ func RandSeq(length int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func UpdateClient(currentVersion string, forceUpdate bool) error {
+	updateDir := ".cnative" + string(os.PathSeparator)
+	if endpoints, err := Endpoints(); err == nil {
+		updateBase := endpoints["update"]
+		if !strings.HasSuffix(updateBase, "/") {
+			updateBase = fmt.Sprintf("%s/", updateBase)
+		}
+		var updater = &selfupdate.Updater{
+			CurrentVersion: currentVersion,
+			ApiURL:         updateBase,
+			BinURL:         updateBase,
+			DiffURL:        updateBase,
+			Dir:            updateDir,
+			CheckTime:      24 * 7,
+			CmdName:        "cnative",
+			ForceCheck:     forceUpdate,
+		}
+		return updater.BackgroundRun()
+	} else {
+		return err
+	}
 }
