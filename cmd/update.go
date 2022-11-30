@@ -22,12 +22,7 @@ THE SOFTWARE.
 package cmd
 
 import (
-	"fmt"
-	"os"
-	"strings"
-
 	"github.com/cnative-dev/cli/internal"
-	"github.com/sanbornm/go-selfupdate/selfupdate"
 	"github.com/spf13/cobra"
 )
 
@@ -39,37 +34,15 @@ func NewUpdateCommand(version string) *cobra.Command {
 			//override root update check
 		},
 		Run: func(cmd *cobra.Command, args []string) {
-			if endpoints, err := internal.Endpoints(); err == nil {
-				updateBase := endpoints["update"]
-				if !strings.HasSuffix(updateBase, "/") {
-					updateBase = fmt.Sprintf("%s/", updateBase)
-				}
-				if home, err := os.UserHomeDir(); err == nil {
-					var updater = &selfupdate.Updater{
-						CurrentVersion: version,
-						ApiURL:         updateBase,
-						BinURL:         updateBase,
-						DiffURL:        updateBase,
-						Dir:            fmt.Sprintf("%s/.cnative/", home),
-						CheckTime:      24,
-						CmdName:        "cnative",
-						ForceCheck:     true,
-					}
-					if newV, e := updater.UpdateAvailable(); e == nil && newV != "" {
-						spinner := internal.NewSpinner()
-						spinner.Suffix = " 正在更新..."
-						spinner.FinalMSG = " 完成\n"
-						spinner.Start()
-						if err := updater.BackgroundRun(); err != nil {
-							spinner.FinalMSG = "更新出错，使用 sudo 尝试更新\n"
-						}
-						spinner.Stop()
-					}
-				}
-			} else {
-				fmt.Fprintln(os.Stderr, err.Error())
-				return
+			spinner := internal.NewSpinner()
+			spinner.Suffix = " 正在更新..."
+			spinner.FinalMSG = " 完成\n"
+			spinner.Start()
+			if err := internal.UpdateClient(version, true); err != nil {
+				spinner.FinalMSG = "更新出错，使用 sudo/管理员账号 尝试\n"
 			}
+			spinner.Stop()
+
 		},
 	}
 	internal.InitCommand(cmd)
