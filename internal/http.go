@@ -16,7 +16,7 @@ func init() {
 	if base, found := os.LookupEnv("CNATIVE_API"); found {
 		client.SetBaseURL(base)
 	} else {
-		client.SetBaseURL("https://api.cnative.dev")
+		client.SetBaseURL("https://api.cnativedev.com")
 	}
 }
 
