@@ -76,7 +76,8 @@ func NewRepoPushCommand() *cobra.Command {
 								Force:      force,
 							}
 							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
-							spinner := internal.NewSpinnerWithHook(func() {
+							spinner := internal.NewSpinner()
+							internal.AddCallback(func() {
 								repo.DeleteRemote(remoteName)
 							})
 							spinner.Start()
