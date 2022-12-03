@@ -35,15 +35,6 @@ func NewAuthLogoutCommand() *cobra.Command {
 		Short: "登出 CNative",
 		Run: func(cmd *cobra.Command, args []string) {
 			viper.Set("token", "")
-			// // 设置 netrc
-			// rcs, _ := internal.ReadNetrc()
-			// filtered := []internal.NetrcLine{}
-			// for _, rc := range rcs {
-			// 	if rc.Machine != "git.cnative.dev" {
-			// 		filtered = append(filtered, rc)
-			// 	}
-			// }
-			// internal.WriteNetrc(filtered)
 			fmt.Println("已登出")
 		},
 	}
