@@ -70,7 +70,14 @@ func NewAuthLoginCommand() *cobra.Command {
 				6, 6, 6, 6, 6, 6, 6, 6, 6, 6, // 60sec
 				6, 6, 6, 6, 6, 6, 6, 6, 6, 6, // 60sec
 			} // 5 minutes
+			interrupt := false
+			internal.AddCallback(func() {
+				interrupt = true
+			})
 			for _, interval := range intervals {
+				if interrupt {
+					break
+				}
 				if resp, err := internal.R().
 					SetQueryParam("session", session).
 					SetResult(responseToken).
