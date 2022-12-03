@@ -52,7 +52,7 @@ func NewAuthLoginCommand() *cobra.Command {
 			if base, found := os.LookupEnv("CNATIVE_API"); found {
 				host = base
 			} else {
-				host = "https://api.cnative.dev"
+				host = "https://api.cnativedev.com"
 			}
 
 			s := internal.NewSpinner()
