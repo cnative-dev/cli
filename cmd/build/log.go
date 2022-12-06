@@ -44,11 +44,15 @@ func NewBuildLogCommand() *cobra.Command {
 			internal.WithAuthorized(func() {
 				ignoreCloseError := false
 				s := internal.NewSpinner()
-				resp, _ := internal.R().
+				resp, err := internal.R().
 					SetPathParam("projectId", project).
 					SetPathParam("buildId", args[0]).
 					SetDoNotParseResponse(true).
 					Get("/api/projects/{projectId}/builds/{buildId}/log")
+				if resp.StatusCode() != 200 || err != nil {
+					internal.HandleError(resp, err)
+					return
+				}
 				s.Start()
 				defer func() {
 					s.Stop()

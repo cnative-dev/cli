@@ -51,12 +51,16 @@ func NewRuntimeLogCommand() *cobra.Command {
 				} else {
 					time = "0"
 				}
-				resp, _ := internal.R().
+				resp, err := internal.R().
 					SetPathParam("projectId", project).
 					SetQueryParam("time", time).
 					SetQueryParam("lines", strconv.Itoa(lines)).
 					SetDoNotParseResponse(true).
 					Get("/api/projects/{projectId}/log")
+				if resp.StatusCode() != 200 || err != nil {
+					internal.HandleError(resp, err)
+					return
+				}
 				s.Start()
 				defer func() {
 					s.Stop()

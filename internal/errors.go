@@ -3,6 +3,7 @@ package internal
 import (
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
 
 	"github.com/go-resty/resty/v2"
@@ -40,7 +41,8 @@ func HandleError(response *resty.Response, err error) {
 		fmt.Fprintf(os.Stderr, "出错了, %s\n", err)
 	} else {
 		definedGlobalError := &ErrResp{}
-		if marshalError := json.Unmarshal(response.Body(), definedGlobalError); marshalError == nil {
+		content, _ := ioutil.ReadAll(response.RawResponse.Body)
+		if marshalError := json.Unmarshal(content, definedGlobalError); marshalError == nil {
 			fmt.Fprintln(os.Stderr, translate(definedGlobalError.Code))
 		} else {
 			fmt.Fprintf(os.Stderr, "服务器出错了, [%s]%s\n", response.Status(), response.Body())
