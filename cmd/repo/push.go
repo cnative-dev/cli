@@ -24,7 +24,9 @@ package repo
 import (
 	"encoding/json"
 	"fmt"
+	"os/signal"
 	"strings"
+	"syscall"
 
 	"os"
 
@@ -78,6 +80,13 @@ func NewRepoPushCommand() *cobra.Command {
 							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
 							spinner := internal.NewSpinner()
 							spinner.Start()
+							sig := make(chan os.Signal, 1)
+							signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
+							go func() {
+								<-sig
+								repo.DeleteRemote(remoteName)
+								os.Exit(1)
+							}()
 							defer func() {
 								spinner.Stop()
 								repo.DeleteRemote(remoteName)

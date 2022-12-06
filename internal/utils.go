@@ -25,7 +25,7 @@ func WithAuthorized(code func()) {
 }
 
 func NewSpinner() *spinner.Spinner {
-	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
+	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond, spinner.WithHiddenCursor(false))
 	return spin
 }
 
