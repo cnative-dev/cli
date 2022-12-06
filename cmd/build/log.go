@@ -59,7 +59,6 @@ func NewBuildLogCommand() *cobra.Command {
 					ignoreCloseError = true
 					resp.RawResponse.Body.Close()
 				}()
-				defer resp.RawResponse.Body.Close()
 				reader := bufio.NewReader(resp.RawResponse.Body)
 				buffer := []string{}
 				for {
@@ -69,18 +68,14 @@ func NewBuildLogCommand() *cobra.Command {
 							buffer = append(buffer, string(line))
 						} else {
 							buffer = append(buffer, string(line))
-							s.Disable()
 							fmt.Println(strings.Join(buffer, ""))
-							s.Enable()
 							buffer = []string{}
 						}
 					} else if ignoreCloseError {
 						break
 					} else if err == io.EOF {
 						if len(buffer) > 0 {
-							s.Disable()
 							fmt.Println(buffer)
-							s.Enable()
 						}
 						break
 					} else if err != nil {

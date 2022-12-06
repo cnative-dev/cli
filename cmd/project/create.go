@@ -37,22 +37,20 @@ func NewProjectCreateCommand() *cobra.Command {
 				project := &Project{}
 				s := internal.NewSpinner()
 				s.Start()
+				defer func() {
+					s.Stop()
+				}()
 				if resp, err := internal.R().
 					SetResult(project).
 					SetQueryParam("name", args[0]).
 					Post("/api/projects"); err == nil &&
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
-					s.Disable()
 					internal.PrettyStruct(project)
 					fmt.Println("完成")
 				} else {
-					s.Disable()
 					internal.HandleError(resp, err)
-					s.Stop()
 					return
 				}
-				s.Enable()
-				s.Stop()
 			})
 		},
 	}
