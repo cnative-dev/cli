@@ -37,8 +37,7 @@ func NewAuthLoginCommand() *cobra.Command {
 	var provider string
 	var timeout int
 	type Token struct {
-		Token    string `json:"token"`
-		GitToken string `json:"git"`
+		Token string `json:"token"`
 	}
 	responseToken := &Token{}
 
@@ -61,7 +60,6 @@ func NewAuthLoginCommand() *cobra.Command {
 			s.FinalMSG = "  process login request...timeout.\n"
 			url := fmt.Sprintf("%s/auth/%s/authorize?session=%s&expires=%d", host, provider, session, timeout)
 			fmt.Printf("如果系统浏览器没有自动打开，请访问：%s\n", url)
-			s.Start()
 			browser.OpenURL(url)
 			intervals := []int{2, 1, 2, 3, 3, 3, 5, 5, 6, //30sec
 				6, 6, 6, 6, 6, // 30sec
@@ -71,9 +69,11 @@ func NewAuthLoginCommand() *cobra.Command {
 				6, 6, 6, 6, 6, 6, 6, 6, 6, 6, // 60sec
 			} // 5 minutes
 			interrupt := false
-			internal.AddCallback(func() {
+			s.Start()
+			defer func() {
+				s.Stop()
 				interrupt = true
-			})
+			}()
 			for _, interval := range intervals {
 				if interrupt {
 					break
@@ -85,10 +85,12 @@ func NewAuthLoginCommand() *cobra.Command {
 					s.FinalMSG = "  process login request...done.\n"
 					viper.Set("token", responseToken.Token)
 					break
+				} else if resp.StatusCode() != 404 {
+					internal.HandleError(resp, err)
+					return
 				}
 				time.Sleep(time.Duration(interval) * time.Second)
 			}
-			s.Stop()
 		},
 	}
 	internal.InitCommand(cmd)

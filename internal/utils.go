@@ -6,9 +6,7 @@ import (
 	"io"
 	"math/rand"
 	"os"
-	"os/signal"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/briandowns/spinner"
@@ -26,25 +24,9 @@ func WithAuthorized(code func()) {
 	}
 }
 
-var signalCallbacks []func()
-
 func NewSpinner() *spinner.Spinner {
 	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
-	sigc := make(chan os.Signal, 1)
-	signal.Notify(sigc, syscall.SIGTERM, syscall.SIGINT)
-	go func() {
-		<-sigc
-		spin.Stop()
-		for _, callback := range signalCallbacks {
-			callback()
-		}
-		return
-	}()
 	return spin
-}
-
-func AddCallback(callback func()) {
-	signalCallbacks = append(signalCallbacks, callback)
 }
 
 func IsAuthorized() bool {

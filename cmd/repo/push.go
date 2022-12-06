@@ -77,10 +77,11 @@ func NewRepoPushCommand() *cobra.Command {
 							}
 							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
 							spinner := internal.NewSpinner()
-							internal.AddCallback(func() {
-								repo.DeleteRemote(remoteName)
-							})
 							spinner.Start()
+							defer func() {
+								spinner.Stop()
+								repo.DeleteRemote(remoteName)
+							}()
 							//推送
 							if err := repo.Push(options); err != nil {
 								if err == git.ErrForceNeeded || strings.HasPrefix(err.Error(), "non-fast-forward") {
@@ -92,9 +93,7 @@ func NewRepoPushCommand() *cobra.Command {
 									fmt.Fprintln(os.Stderr, err.Error())
 									spinner.Enable()
 								}
-								spinner.Stop()
 							} else {
-								spinner.Stop()
 								fmt.Println("完成.")
 							}
 						}

@@ -23,7 +23,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/cnative-dev/cli/internal"
@@ -74,7 +73,7 @@ func NewConfigApplyCommand() *cobra.Command {
 						internal.PrettyMapAsArray(*config)
 						fmt.Println("完成")
 					} else {
-						fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+						internal.HandleError(resp, err)
 						return
 					}
 				}

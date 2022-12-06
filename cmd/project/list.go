@@ -23,8 +23,6 @@ package project
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 	"reflect"
 
 	"github.com/cnative-dev/cli/internal"
@@ -46,7 +44,7 @@ func NewProjectListCommand() *cobra.Command {
 					json.Unmarshal(resp.Body(), projects)
 					internal.PrettyStructArray(projects, reflect.TypeOf(Project{}))
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

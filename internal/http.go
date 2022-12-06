@@ -20,11 +20,6 @@ func init() {
 	}
 }
 
-type ErrResp struct {
-	Error   string      `json:"error"`
-	Details interface{} `json:"details,omitempty"`
-}
-
 func SetVersion(version string) {
 	clientVersion = version
 }

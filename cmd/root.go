@@ -23,7 +23,7 @@ package cmd
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"log"
 	"os"
 	"time"
@@ -77,7 +77,7 @@ func Execute() {
 
 func init() {
 	if version != "dev" {
-		log.SetOutput(ioutil.Discard)
+		log.SetOutput(io.Discard)
 	}
 
 	cobra.OnInitialize(initConfig)
