@@ -85,6 +85,9 @@ func NewAuthLoginCommand() *cobra.Command {
 					s.FinalMSG = "  process login request...done.\n"
 					viper.Set("token", responseToken.Token)
 					break
+				} else if resp.StatusCode() != 404 {
+					internal.HandleError(resp, err)
+					return
 				}
 				time.Sleep(time.Duration(interval) * time.Second)
 			}

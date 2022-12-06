@@ -23,7 +23,6 @@ package config
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/cnative-dev/cli/internal/flags"
@@ -45,7 +44,7 @@ func NewConfigRemoveCommand() *cobra.Command {
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					fmt.Printf("配置 %s 已删除\n", args[0])
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

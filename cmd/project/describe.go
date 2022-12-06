@@ -22,9 +22,6 @@ THE SOFTWARE.
 package project
 
 import (
-	"fmt"
-	"os"
-
 	"github.com/cnative-dev/cli/internal"
 	"github.com/spf13/cobra"
 )
@@ -45,7 +42,7 @@ func NewProjectDescribeCommand() *cobra.Command {
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					internal.PrettyStruct(project)
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

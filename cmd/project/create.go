@@ -23,7 +23,6 @@ package project
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/spf13/cobra"
@@ -48,7 +47,7 @@ func NewProjectCreateCommand() *cobra.Command {
 					fmt.Println("完成")
 				} else {
 					s.Disable()
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					s.Stop()
 					return
 				}

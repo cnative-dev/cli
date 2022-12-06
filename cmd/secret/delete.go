@@ -23,7 +23,6 @@ package secret
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/cnative-dev/cli/internal/flags"
@@ -44,7 +43,7 @@ func NewSecretDeleteCommand() *cobra.Command {
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					fmt.Printf("Secret 已删除\n")
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

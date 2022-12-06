@@ -23,8 +23,6 @@ package build
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 	"reflect"
 
 	"github.com/cnative-dev/cli/internal"
@@ -47,7 +45,7 @@ func NewBuildListCommand() *cobra.Command {
 					json.Unmarshal(resp.Body(), builds)
 					internal.PrettyStructArray(builds, reflect.TypeOf(ListBuild{}))
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

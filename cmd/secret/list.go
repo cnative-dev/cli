@@ -23,8 +23,6 @@ package secret
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/cnative-dev/cli/internal/flags"
@@ -47,7 +45,7 @@ func NewSecretListCommand() *cobra.Command {
 					json.Unmarshal(resp.Body(), secret)
 					internal.PrettyArray(*secret)
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

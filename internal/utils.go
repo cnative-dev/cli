@@ -24,8 +24,6 @@ func WithAuthorized(code func()) {
 	}
 }
 
-var signalCallbacks []func()
-
 func NewSpinner() *spinner.Spinner {
 	spin := spinner.New(spinner.CharSets[9], 100*time.Millisecond)
 	return spin

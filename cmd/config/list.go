@@ -23,8 +23,6 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/cnative-dev/cli/internal/flags"
@@ -47,7 +45,7 @@ func NewConfigListCommand() *cobra.Command {
 					json.Unmarshal(resp.Body(), config)
 					internal.PrettyMapAsArray(*config)
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})
