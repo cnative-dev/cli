@@ -46,7 +46,9 @@ func NewProjectCreateCommand() *cobra.Command {
 					Post("/api/projects"); err == nil &&
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					internal.PrettyStruct(project)
+					s.Disable()
 					fmt.Println("完成")
+					s.Enable()
 				} else {
 					internal.HandleError(resp, err)
 					return
