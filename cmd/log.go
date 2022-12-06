@@ -43,21 +43,30 @@ func NewRuntimeLogCommand() *cobra.Command {
 		Short:   "查看线上日志",
 		Run: func(cmd *cobra.Command, args []string) {
 			internal.WithAuthorized(func() {
+				ignoreCloseError := false
 				s := internal.NewSpinner()
-				s.Start()
 				var time string
 				if showTime {
 					time = "1"
 				} else {
 					time = "0"
 				}
-				resp, _ := internal.R().
+				resp, err := internal.R().
 					SetPathParam("projectId", project).
 					SetQueryParam("time", time).
 					SetQueryParam("lines", strconv.Itoa(lines)).
 					SetDoNotParseResponse(true).
 					Get("/api/projects/{projectId}/log")
-				defer resp.RawResponse.Body.Close()
+				if resp.StatusCode() != 200 || err != nil {
+					internal.HandleError(resp, err)
+					return
+				}
+				s.Start()
+				defer func() {
+					s.Stop()
+					ignoreCloseError = true
+					resp.RawResponse.Body.Close()
+				}()
 				reader := bufio.NewReader(resp.RawResponse.Body)
 				buffer := []string{}
 				for {
@@ -72,6 +81,8 @@ func NewRuntimeLogCommand() *cobra.Command {
 							s.Enable()
 							buffer = []string{}
 						}
+					} else if ignoreCloseError {
+						break
 					} else if err == io.EOF {
 						if len(buffer) > 0 {
 							s.Disable()
@@ -83,7 +94,6 @@ func NewRuntimeLogCommand() *cobra.Command {
 						panic(err)
 					}
 				}
-				s.Stop()
 			})
 		},
 	}

@@ -23,7 +23,6 @@ package secret
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/cnative-dev/cli/internal"
 	"github.com/cnative-dev/cli/internal/flags"
@@ -46,7 +45,7 @@ func NewSecretAddCommand() *cobra.Command {
 					resp.StatusCode() >= 200 && resp.StatusCode() < 300 {
 					fmt.Println("完成")
 				} else {
-					fmt.Fprintln(os.Stderr, resp.Error().(*internal.ErrResp).Details)
+					internal.HandleError(resp, err)
 					return
 				}
 			})

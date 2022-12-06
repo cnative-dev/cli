@@ -44,16 +44,21 @@ func NewBuildLogCommand() *cobra.Command {
 			internal.WithAuthorized(func() {
 				ignoreCloseError := false
 				s := internal.NewSpinner()
-				s.Start()
-				resp, _ := internal.R().
+				resp, err := internal.R().
 					SetPathParam("projectId", project).
 					SetPathParam("buildId", args[0]).
 					SetDoNotParseResponse(true).
 					Get("/api/projects/{projectId}/builds/{buildId}/log")
-				internal.AddCallback(func() {
+				if resp.StatusCode() != 200 || err != nil {
+					internal.HandleError(resp, err)
+					return
+				}
+				s.Start()
+				defer func() {
+					s.Stop()
 					ignoreCloseError = true
 					resp.RawResponse.Body.Close()
-				})
+				}()
 				defer resp.RawResponse.Body.Close()
 				reader := bufio.NewReader(resp.RawResponse.Body)
 				buffer := []string{}
@@ -80,9 +85,10 @@ func NewBuildLogCommand() *cobra.Command {
 						break
 					} else if err != nil {
 						panic(err)
+					} else {
+						break
 					}
 				}
-				s.Stop()
 			})
 		},
 	}
