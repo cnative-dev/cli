@@ -88,7 +88,6 @@ func NewRepoPushCommand() *cobra.Command {
 								os.Exit(1)
 							}()
 							defer func() {
-								spinner.Stop()
 								repo.DeleteRemote(remoteName)
 							}()
 							//推送
