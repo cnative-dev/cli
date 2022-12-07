@@ -43,7 +43,6 @@ func NewRuntimeLogCommand() *cobra.Command {
 		Short:   "查看线上日志",
 		Run: func(cmd *cobra.Command, args []string) {
 			internal.WithAuthorized(func() {
-				ignoreCloseError := false
 				s := internal.NewSpinner()
 				var time string
 				if showTime {
@@ -62,11 +61,6 @@ func NewRuntimeLogCommand() *cobra.Command {
 					return
 				}
 				s.Start()
-				defer func() {
-					s.Stop()
-					ignoreCloseError = true
-					resp.RawResponse.Body.Close()
-				}()
 				reader := bufio.NewReader(resp.RawResponse.Body)
 				buffer := []string{}
 				for {
@@ -76,14 +70,16 @@ func NewRuntimeLogCommand() *cobra.Command {
 							buffer = append(buffer, string(line))
 						} else {
 							buffer = append(buffer, string(line))
+							s.Disable()
 							fmt.Println(strings.Join(buffer, ""))
+							s.Enable()
 							buffer = []string{}
 						}
-					} else if ignoreCloseError {
-						break
 					} else if err == io.EOF {
 						if len(buffer) > 0 {
+							s.Disable()
 							fmt.Println(buffer)
+							s.Enable()
 						}
 						break
 					} else if err != nil {
