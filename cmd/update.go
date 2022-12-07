@@ -22,6 +22,9 @@ THE SOFTWARE.
 package cmd
 
 import (
+	"fmt"
+	"time"
+
 	"github.com/cnative-dev/cli/internal"
 	"github.com/spf13/cobra"
 )
@@ -38,10 +41,42 @@ func NewUpdateCommand(version string) *cobra.Command {
 			spinner.Suffix = " 正在更新..."
 			spinner.FinalMSG = " 完成\n"
 			spinner.Start()
-			if err := internal.UpdateClient(version, true); err != nil {
-				spinner.FinalMSG = "更新出错，使用 sudo/管理员账号 尝试\n"
-			}
-			spinner.Stop()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			time.Sleep(time.Duration(1) * time.Second)
+			spinner.Disable()
+			fmt.Println(1)
+			spinner.Enable()
+			// if err := internal.UpdateClient(version, true); err != nil {
+			// 	spinner.FinalMSG = "更新出错，使用 sudo/管理员账号 尝试\n"
+			// }
+			// spinner.Stop()
 
 		},
 	}

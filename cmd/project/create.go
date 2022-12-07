@@ -37,9 +37,6 @@ func NewProjectCreateCommand() *cobra.Command {
 				project := &Project{}
 				s := internal.NewSpinner()
 				s.Start()
-				defer func() {
-					s.Stop()
-				}()
 				if resp, err := internal.R().
 					SetResult(project).
 					SetQueryParam("name", args[0]).

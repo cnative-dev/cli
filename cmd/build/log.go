@@ -42,7 +42,6 @@ func NewBuildLogCommand() *cobra.Command {
 		Short:   "查看构建日志",
 		Run: func(cmd *cobra.Command, args []string) {
 			internal.WithAuthorized(func() {
-				ignoreCloseError := false
 				s := internal.NewSpinner()
 				resp, err := internal.R().
 					SetPathParam("projectId", project).
@@ -54,11 +53,6 @@ func NewBuildLogCommand() *cobra.Command {
 					return
 				}
 				s.Start()
-				defer func() {
-					s.Stop()
-					ignoreCloseError = true
-					resp.RawResponse.Body.Close()
-				}()
 				reader := bufio.NewReader(resp.RawResponse.Body)
 				buffer := []string{}
 				for {
@@ -73,8 +67,6 @@ func NewBuildLogCommand() *cobra.Command {
 							s.Enable()
 							buffer = []string{}
 						}
-					} else if ignoreCloseError {
-						break
 					} else if err == io.EOF {
 						if len(buffer) > 0 {
 							s.Disable()
