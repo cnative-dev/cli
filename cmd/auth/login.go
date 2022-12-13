@@ -83,6 +83,7 @@ func NewAuthLoginCommand() *cobra.Command {
 				}
 				time.Sleep(time.Duration(interval) * time.Second)
 			}
+			s.Stop()
 		},
 	}
 	internal.InitCommand(cmd)
