@@ -56,8 +56,8 @@ var rootCmd = &cobra.Command{
 	Version: version,
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		silenceUpdateCkTime := viper.GetTime("silence_update_cktime")
-		if silenceUpdateCkTime.Before(time.Now()) { //first time check every day，force and background
-			go internal.UpdateClient(version, true)
+		if silenceUpdateCkTime.Before(time.Now()) { //first time check every day，force update
+			internal.UpdateClient(version, true)
 			tomorrow := time.Now().AddDate(0, 0, 1)
 			viper.Set("silence_update_cktime", tomorrow.Unix()/(3600*24)*(3600*24)) //第二天零点
 		} else {
