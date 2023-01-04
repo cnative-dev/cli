@@ -41,6 +41,7 @@ func NewRuntimeLogCommand() *cobra.Command {
 		Use:     "log",
 		Aliases: []string{"logs"},
 		Short:   "查看线上日志",
+		Hidden:  true,
 		Run: func(cmd *cobra.Command, args []string) {
 			internal.WithAuthorized(func() {
 				s := internal.NewSpinner()
