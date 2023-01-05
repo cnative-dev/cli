@@ -63,23 +63,13 @@ func NewRepoPushCommand() *cobra.Command {
 							SetResult(&link).
 							SetPathParam("projectName", args[0]).
 							Get("/api/projects/{projectName}"); err == nil && resp.StatusCode() == 200 {
+							spinner := internal.NewSpinner()
 							//创建远程分支
 							repo.CreateRemote(&config.RemoteConfig{
 								Name: remoteName,
 								URLs: []string{link.URL},
 							})
-							defer repo.DeleteRemote(remoteName)
-							currentReference, _ := repo.Head()
-							refSpec := fmt.Sprintf("refs/heads/%s:refs/heads/main", currentReference.Name().Short())
-							options := &git.PushOptions{
-								RefSpecs:   []config.RefSpec{config.RefSpec(refSpec)},
-								RemoteName: remoteName,
-								Auth:       auth,
-								Force:      force,
-							}
-							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
-							spinner := internal.NewSpinner()
-							spinner.Start()
+							//注册 handler 保证清理创建的远程分支
 							sig := make(chan os.Signal, 1)
 							signal.Notify(sig, syscall.SIGINT, syscall.SIGTERM)
 							go func() {
@@ -88,13 +78,27 @@ func NewRepoPushCommand() *cobra.Command {
 								os.Exit(1)
 							}()
 							defer func() {
+								spinner.Stop()
 								repo.DeleteRemote(remoteName)
 							}()
+							//准备推送
+							currentReference, _ := repo.Head()
+							refSpec := fmt.Sprintf("refs/heads/%s:refs/heads/main", currentReference.Name().Short())
+							options := &git.PushOptions{
+								RefSpecs:   []config.RefSpec{config.RefSpec(refSpec)},
+								RemoteName: remoteName,
+								Progress:   os.Stdout,
+								Auth:       auth,
+								Force:      force,
+							}
+							fmt.Printf("正在推送本地分支 %s, 到项目 %s\n", currentReference.Name().Short(), args[0])
+							spinner.Start()
+
 							//推送
 							if err := repo.Push(options); err != nil {
 								if err == git.ErrForceNeeded || strings.HasPrefix(err.Error(), "non-fast-forward") {
 									spinner.Disable()
-									fmt.Fprintln(os.Stderr, "远程提交历史记录与本地不同步，请确认本地代码和项目的对应关系，强制推送请用 force 参数")
+									fmt.Fprintf(os.Stderr, "如果需要确认服务端代码的 commit id，请用命令:\n cnative build list -p %s\n", args[0])
 									spinner.Enable()
 								} else {
 									spinner.Disable()
